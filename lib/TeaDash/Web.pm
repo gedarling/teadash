@@ -36,18 +36,11 @@ use Web::Simple 'TeaDash::Web';
   }
   
   sub main {
-    open (my $fh, '<', '../../static/html/dash.html');
-    
-    my $html = do { local $/; <$fh> };
-    
-    my $zoom = HTML::Zoom->from_html($html);
+    my $zoom = HTML::Zoom->from_file('static/html/dash.html');
     
     $zoom = $zoom->select('title,#today')
       ->replace_content($self->today);
     
-    use Devel::Dwarn;
-    
-    Dwarn $self->details;
     $zoom = $zoom->select('#stats')
       ->repeat_content([
         map {
