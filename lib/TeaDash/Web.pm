@@ -2,7 +2,7 @@
 use Web::Simple 'TeaDash::Web';
 {
   package TeaDash::Web;
-  use JSON::XS qw/decode_json/;
+  use JSON::XS qw/encode_json decode_json/;
   use LWP::Simple;
   use HTML::Zoom;
   use autodie;
@@ -24,7 +24,7 @@ use Web::Simple 'TeaDash::Web';
       LWP::Simple::get('http://localhost:5000/current_tea')
     );
     
-    return "Today's tea is $current_tea->{data}[0]{name}";  
+    return "Today's tea is $current_tea->{data}{name}";  
   }
   
   sub details {
@@ -33,6 +33,20 @@ use Web::Simple 'TeaDash::Web';
     );
     
     return $stats->{data};
+  }
+  
+  sub pie {
+    my $stats = decode_json(
+      LWP::Simple::get('http://192.168.1.5:5000/stats')
+    );
+    
+    my @return = map {
+      [ $_->{name}, $_->{count} ]
+    } @{ $stats->{data}};
+    
+    return _derp([ 'Content-type', 'text/json' ],
+      [ encode_json(\@return) ]
+    );
   }
   
   sub main {
@@ -52,11 +66,20 @@ use Web::Simple 'TeaDash::Web';
         } @{ $self->details }
       ]);
     
-    return _derp([ 'Content-type', 'text/html' ], [$zoom->to_html] );
+    return _derp([ 'Content-type', 'text/html'], [$zoom->to_html] );
   }
   
   dispatch {
-    sub (GET) { $self->main },
+    sub (GET + /) { $self->main },
+    sub (GET + /test) { $self->pie },
+    sub (/static/**) {
+      my $file = $_[1];
+      open my $fh, '<', "static/$file" or return [ 404, [ 'Content-type', 'text/html' ], [ 'file not found']];
+      local $/ = undef;
+      my $data = <$fh>;
+      close $fh or return [ 500, [ 'Content-type', 'text/html' ], [ 'Internal Server Error'] ];
+      [ 200, [ 'Content-type' => 'text/html' ], [ $data ] ]
+    },    
   };  
 };
 
