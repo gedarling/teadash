@@ -4,18 +4,52 @@
 <html lang="en">
 <head>
     <title>Tea Dash!</title>
-    <link rel="stylesheet" type="text/css" href="/static/js/lib/jqplot/jquery.jqplot.css" />
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
-    <!--[if IE]><script type="text/javascript" src="/static/js/lib/jqplot/excanvas.js"></script><![endif]-->
-    <script type="text/javascript" src="/static/js/lib/jqplot/jquery.jqplot.js"></script>
-    <script type="text/javascript" src="/static/js/lib/jqplot/plugins/jqplot.pieRenderer.js"></script>
+    <script type="text/javascript" src="/static/js/lib/raphael/raphael-min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/raphael/g.raphael-min.js"></script>
+    <script type="text/javascript" src="/static/js/lib/raphael/g.pie-min.js"></script>
     <script>
         $.getJSON('http://localhost:3000/test', function(data) {
-            plot = $.jqplot('pie_graph', [data], {
-                title: 'Tea Consumption',
-                seriesDefaults:{renderer:$.jqplot.PieRenderer, rendererOptions:{sliceMargin:6}},
-                legend:{show:true,location: 'w'}
+            var fields = [];
+            var labels = [];
+            $.each(data, function(idx,value){
+                labels.push('%%.%% - ' + value[0]);
+                fields.push(value[1]);
             });
+            
+            
+            
+            var r = Raphael('pie_graph');
+            r.g.txtattr.font = "12px 'Fontin Sans', Fontin-Sans, sans-serif";
+            r.g.text(320, 10, "Tea Consumption").attr({"font-size": 20});
+            
+            var pie = r.g.piechart(
+                320,
+                200,
+                160,
+                fields,
+                {
+                    legend: labels,
+                    legendpos: "east"
+                }
+            );
+            
+            pie.hover(function () {
+                this.sector.stop();
+                this.sector.scale(1.1, 1.1, this.cx, this.cy);
+                if (this.label) {
+                    this.label[0].stop();
+                    this.label[0].scale(1.5);
+                    this.label[1].attr({"font-weight": 800});
+                }
+            }, function () {
+                this.sector.animate({scale: [1, 1, this.cx, this.cy]}, 500, "bounce");
+                if (this.label) {
+                    this.label[0].animate({scale: 1}, 500, "bounce");
+                    this.label[1].attr({"font-weight": 400});
+                }
+            });
+            
         });
     </script>
 
