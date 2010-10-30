@@ -4,17 +4,17 @@
 <html lang="en">
 <head>
     <title>Tea Dash!</title>
+    <link rel="stylesheet" type="text/css" href="/static/js/lib/jqplot/jquery.jqplot.css" />
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
     <!--[if IE]><script type="text/javascript" src="/static/js/lib/jqplot/excanvas.js"></script><![endif]-->
     <script type="text/javascript" src="/static/js/lib/jqplot/jquery.jqplot.js"></script>
     <script type="text/javascript" src="/static/js/lib/jqplot/plugins/jqplot.pieRenderer.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/js/lib/jqplot/jquery.jqplot.css" />
     <script>
         $.getJSON('http://localhost:3000/test', function(data) {
             plot = $.jqplot('pie_graph', [data], {
                 title: 'Tea Consumption',
-                seriesDefaults:{renderer:$.jqplot.PieRenderer, rendererOptions:{sliceMargin:8}},
-                legend:{show:true}
+                seriesDefaults:{renderer:$.jqplot.PieRenderer, rendererOptions:{sliceMargin:6}},
+                legend:{show:true,location: 'w'}
             });
         });
     </script>
@@ -29,6 +29,6 @@
             Count: <span class="count"></span>
         </li>
     </li>
-    <div id="pie_graph" style="height:800px;width:500px;"></div>
+    <div id="pie_graph" style="height:500px;width:800px;"></div>
 </body>
 </html>

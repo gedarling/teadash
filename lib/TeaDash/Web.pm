@@ -37,7 +37,7 @@ use Web::Simple 'TeaDash::Web';
   
   sub pie {
     my $stats = decode_json(
-      LWP::Simple::get('http://192.168.1.5:5000/stats')
+      LWP::Simple::get('http://localhost:5000/stats')
     );
     
     my @return = map {
