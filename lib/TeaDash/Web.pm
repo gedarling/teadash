@@ -6,6 +6,7 @@ use Web::Simple 'TeaDash::Web';
   use JSON::XS qw/encode_json/;
   use HTML::Zoom;
   use autodie;
+  use feature ':5.10';
   
   my $teatime = Net::HTTP::Spore->new_from_spec(
     '/home/geoff/code/teadash/lib/TeaDash/teatime.json',
@@ -74,11 +75,25 @@ use Web::Simple 'TeaDash::Web';
     sub (GET + /test) { $self->pie },
     sub (/static/**) {
       my $file = $_[1];
-      open my $fh, '<', "static/$file" or return [ 404, [ 'Content-type', 'text/html' ], [ 'file not found']];
+      
+      my $content_type;
+      given ($file) {
+        when (/.js/){
+          $content_type = 'text/javascript';
+        }
+        when (/.css/){
+          $content_type = 'text/css';
+        }
+        default {
+          $content_type = 'text/html';
+        }
+      };
+      
+      open my $fh, '<', "static/$file" or return [ 404, [ 'Content-type', $content_type ], [ 'file not found']];
       local $/ = undef;
       my $data = <$fh>;
-      close $fh or return [ 500, [ 'Content-type', 'text/html' ], [ 'Internal Server Error'] ];
-      [ 200, [ 'Content-type' => 'text/html' ], [ $data ] ]
+      close $fh or return [ 500, [ 'Content-type', $content_type ], [ 'Internal Server Error'] ];
+      [ 200, [ 'Content-type' => $content_type ], [ $data ] ]
     },    
   };  
 };
