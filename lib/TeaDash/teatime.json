@@ -1,0 +1,12 @@
+{
+  "methods" : {
+    "current" : {
+      "path" : "/current_tea",
+      "method" : "GET"
+    },
+    "stats" : {
+      "path" : "/stats",
+      "method" : "GET"
+    }
+  }
+}
