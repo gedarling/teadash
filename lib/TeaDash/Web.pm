@@ -17,7 +17,6 @@ use Web::Simple 'TeaDash::Web';
   sub _derp {
     my $headers = shift;
     my $data = shift;
-    my $root = 'http://localhost:3000';
     
     [
       200,
