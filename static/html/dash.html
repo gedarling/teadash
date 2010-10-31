@@ -21,10 +21,10 @@
             
             var r = Raphael('pie_graph');
             r.g.txtattr.font = "12px 'Fontin Sans', Fontin-Sans, sans-serif";
-            r.g.text(320, 10, "Tea Consumption").attr({"font-size": 20});
+            r.g.text(200, 10, "Tea Consumption").attr({"font-size": 20});
             
             var pie = r.g.piechart(
-                320,
+                200,
                 200,
                 160,
                 fields,
@@ -51,18 +51,34 @@
             });
             
         });
-    </script>
+    </script>   
+    <link rel="stylesheet" href="/static/css/blueprint/src/typography.css" type="text/css"/>
+    <link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="/static/css/blueprint/print.css" type="text/css" media="print">	
+    <!--[if lt IE 8]><link rel="stylesheet" href="/static/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
     <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
 </head>
 <body>
-    <div id="today"></div>
-    <p>Detailed Stats:</p>
-    <ul id="stats">
-        <li>
-            Name: <span class="name"></span>
-            Count: <span class="count"></span>
-        </li>
-    </li>
-    <div id="pie_graph" style="height:500px;width:800px;"></div>
+    <div id="container">
+        <div class="span-2">&nbsp;</div>
+        <div class="span-22 last"><h1>Tea Dash</h1></div>
+        <hr/>
+        <div class="span-2">&nbsp;</div>
+        <h3 id="today" class="span-22 last"></h3>
+        <hr class="space" />
+        <div class="span-2">&nbsp;</div>
+        <div class="span-22 last">      
+            <div id="pie_graph" class="span-16"></div>
+            <div class="span-6 last">
+                <ul id="stats">
+                    <li>
+                        Name: <span class="name"></span>
+                        Count: <span class="count"></span>
+                    </li>
+                </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
