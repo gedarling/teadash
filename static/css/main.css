@@ -5,3 +5,7 @@
 body {
   background-color: #FFE3A6;
 }
+
+#events {
+  list-style: none;
+}
