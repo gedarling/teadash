@@ -32,6 +32,12 @@ use Web::Simple 'TeaDash::Web';
     return "Today's tea is $current_tea->{data}{name}";  
   }
   
+  sub last_status {
+    my $current_tea = $teatime->current->body;
+    
+    return "Last status: $current_tea->{data}{events}[0]{name} @ $current_tea->{data}{events}[0]{when}";
+  }
+  
   sub details {
     my $stats = $teatime->stats->body;
     
@@ -59,6 +65,9 @@ use Web::Simple 'TeaDash::Web';
     
     $zoom = $zoom->select('title,#today')
       ->replace_content($self->today);
+    
+    $zoom = $zoom->select('#last_status')
+      ->replace_content($self->last_status);
     
     $zoom = $zoom->select('#events')
       ->repeat_content([
