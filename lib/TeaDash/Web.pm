@@ -38,6 +38,10 @@ use Web::Simple 'TeaDash::Web';
     return $stats->{data};
   }
   
+  sub events {
+    return $teatime->current->body->{data}{events};
+  }
+  
   sub pie {
     my $stats = $teatime->stats->body;
     
@@ -56,15 +60,15 @@ use Web::Simple 'TeaDash::Web';
     $zoom = $zoom->select('title,#today')
       ->replace_content($self->today);
     
-    $zoom = $zoom->select('#stats')
+    $zoom = $zoom->select('#events')
       ->repeat_content([
         map {
-          my $details = $_;
+          my $events = $_;
           sub {
-            $_->select('.name')->replace_content($details->{name})
-              ->select('.count')->replace_content($details->{count});
+            $_->select('.event')->replace_content($events->{name})
+              ->select('.time')->replace_content($events->{when});
           }
-        } @{ $self->details }
+        } @{ $self->events }
       ]);
     
     return _derp([ 'Content-type', 'text/html'], [$zoom->to_html] );
