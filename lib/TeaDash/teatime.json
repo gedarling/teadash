@@ -7,7 +7,7 @@
     "stats" : {
       "path" : "/stats",
       "method" : "GET"
-    }
+    },
     "last_teas" : {
       "path" : "/last_teas",
       "method" : "GET"
