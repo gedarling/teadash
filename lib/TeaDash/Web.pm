@@ -85,7 +85,7 @@ use Web::Simple 'TeaDash::Web';
   
   dispatch {
     sub (GET + /) { $self->main },
-    sub (GET + /test) { $self->pie },
+    sub (GET + /pie) { $self->pie },
     sub (/static/**) {
       my $file = $_[1];
       

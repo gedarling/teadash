@@ -1,4 +1,4 @@
-$.getJSON('/test', function(data) {
+$.getJSON('/pie', function(data) {
   var fields = [];
   var labels = [];
   $.each(data, function(idx,value){
