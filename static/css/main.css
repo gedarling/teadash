@@ -6,6 +6,13 @@ body {
   background-color: #FFFF9D;
 }
 
-#events {
+#recent_history {
   list-style: none;
 }
+
+li {
+  padding-left: 2em;
+  line-height: 30px;
+}
+
+
