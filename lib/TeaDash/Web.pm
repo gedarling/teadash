@@ -10,7 +10,7 @@ use Web::Simple 'TeaDash::Web';
   
   my $teatime = Net::HTTP::Spore->new_from_spec(
     '/home/geoff/code/teadash/lib/TeaDash/teatime.json',
-    api_base_url => 'http://localhost:5000'
+    api_base_url => 'http://10.6.1.73:8320'
   );
   
   $teatime->enable('Format::JSON');
@@ -60,6 +60,11 @@ use Web::Simple 'TeaDash::Web';
     );
   }
   
+  sub recent_history {
+    my @history = @{$teatime->last_teas->body->{data}}[1..10];
+    return \@history;
+  }
+  
   sub main {
     my $zoom = HTML::Zoom->from_file('static/html/dash.html');
     
@@ -69,15 +74,16 @@ use Web::Simple 'TeaDash::Web';
     $zoom = $zoom->select('#last_status')
       ->replace_content($self->last_status);
     
-    $zoom = $zoom->select('#events')
+    $zoom = $zoom->select('#recent_history')
       ->repeat_content([
         map {
-          my $events = $_;
+          my $recent_history = $_;
+          my ($date,$time) = split(/ /,$recent_history->{events}[0]{when});
           sub {
-            $_->select('.event')->replace_content($events->{name})
-              ->select('.time')->replace_content($events->{when});
+            $_->select('.tea')->replace_content($recent_history->{name})
+              ->select('.time')->replace_content($date);
           }
-        } @{ $self->events }
+        } @{ $self->recent_history }
       ]);
     
     return _derp([ 'Content-type', 'text/html'], [$zoom->to_html] );
