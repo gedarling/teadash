@@ -12,8 +12,8 @@ $.getJSON('/pie', function(data) {
   
   var pie = r.g.piechart(
     200,
-    200,
     160,
+    100,
     fields,
     {
       legend: labels,
