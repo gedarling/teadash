@@ -10,7 +10,7 @@ use Web::Simple 'TeaDash::Web';
   
   my $teatime = Net::HTTP::Spore->new_from_spec(
     '/home/geoff/code/teadash/lib/TeaDash/teatime.json',
-    api_base_url => 'http://10.6.1.73:8320'
+    api_base_url => 'http://localhost:5000'
   );
   
   $teatime->enable('Format::JSON');
@@ -61,7 +61,7 @@ use Web::Simple 'TeaDash::Web';
   }
   
   sub recent_history {
-    my @history = @{$teatime->last_teas->body->{data}}[1..10];
+    my @history = splice @{$teatime->last_teas->body->{data}},0,10;
     return \@history;
   }
   
