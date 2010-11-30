@@ -8,7 +8,6 @@ use Web::Simple 'TeaDash::Web';
   use Try::Tiny;
   use autodie;
   use feature ':5.10';
-  use Devel::Dwarn;
   
   local $/ = undef;
   open (my $fh, '<', 'lib/TeaDash/config.json');
@@ -33,30 +32,43 @@ use Web::Simple 'TeaDash::Web';
     ]
   }
   
-  sub today {
-    my $current_tea = $teatime->current->body;
+  sub connected (&) {
+    my $ret;
     
+    try {
+      $ret = $_[0]->();
+    }catch{
+      redispatch_to '/closed';
+    }
+    
+    return $ret;
+  }
+  
+  sub today {
+    my $current_tea = connected { $teatime->current->body };
+  
     return "Today's tea is $current_tea->{data}{name}";  
   }
   
   sub last_status {
-    my $current_tea = $teatime->current->body;
+    my $current_tea = connected { $teatime->current->body };
     
     return "Last status: $current_tea->{data}{events}[0]{name} @ $current_tea->{data}{events}[0]{when}";
   }
   
   sub details {
-    my $stats = $teatime->stats->body;
+    my $stats = connected { $teatime->stats->body };
     
     return $stats->{data};
   }
   
   sub events {
-    return $teatime->current->body->{data}{events};
+    my $current = connected { $teatime->current->body };
+    return $current->{data}{events};
   }
   
   sub pie {
-    my $stats = $teatime->stats->body;
+    my $stats = connected { $teatime->stats->body };
     
     my @return = map {
       [ $_->{name}, $_->{count} ]
@@ -68,7 +80,8 @@ use Web::Simple 'TeaDash::Web';
   }
   
   sub recent_history {
-    my @history = splice @{$teatime->last_teas->body->{data}},0,10;
+    my $last_teas = connected { $teatime->last_teas->body };
+    my @history = splice @{ $last_teas->{data} },0,10;
     return \@history;
   }
   
@@ -120,7 +133,8 @@ use Web::Simple 'TeaDash::Web';
       my $data = <$fh>;
       close $fh or return [ 500, [ 'Content-type', $content_type ], [ 'Internal Server Error'] ];
       [ 200, [ 'Content-type' => $content_type ], [ $data ] ]
-    },    
+    },
+    sub (/closed){ $self->closed },
   };  
 };
 
