@@ -3,14 +3,21 @@ use Web::Simple 'TeaDash::Web';
 {
   package TeaDash::Web;
   use Net::HTTP::Spore;
-  use JSON::XS qw/encode_json/;
+  use JSON::XS qw/encode_json decode_json/;
   use HTML::Zoom;
+  use Try::Tiny;
   use autodie;
   use feature ':5.10';
+  use Devel::Dwarn;
   
+  local $/ = undef;
+  open (my $fh, '<', 'lib/TeaDash/config.json');
+  my $config_file = <$fh>;
+  my $config = decode_json($config_file);
+
   my $teatime = Net::HTTP::Spore->new_from_spec(
-    '/home/geoff/code/teadash/lib/TeaDash/teatime.json',
-    api_base_url => 'http://localhost:5000'
+    $config->{spec_file},
+    api_base_url => $config->{api_base_url}
   );
   
   $teatime->enable('Format::JSON');
