@@ -32,43 +32,31 @@ use Web::Simple 'TeaDash::Web';
     ]
   }
   
-  sub connected (&) {
-    my $ret;
-    
-    try {
-      $ret = $_[0]->();
-    }catch{
-      redispatch_to '/closed';
-    }
-    
-    return $ret;
+  sub closed {
+    return _derp([ 'Content-type', 'text/html'], ['TEA SERVER DOWN']);
   }
   
   sub today {
-    my $current_tea = connected { $teatime->current->body };
-  
+    my $current_tea = $teatime->current->body;
     return "Today's tea is $current_tea->{data}{name}";  
   }
   
   sub last_status {
-    my $current_tea = connected { $teatime->current->body };
+    my $current_tea = $teatime->current->body;
     
     return "Last status: $current_tea->{data}{events}[0]{name} @ $current_tea->{data}{events}[0]{when}";
   }
   
   sub details {
-    my $stats = connected { $teatime->stats->body };
-    
-    return $stats->{data};
+    return $teatime->stats->body->{data};
   }
   
   sub events {
-    my $current = connected { $teatime->current->body };
-    return $current->{data}{events};
+    return $teatime->current->body->{data}{events};
   }
   
   sub pie {
-    my $stats = connected { $teatime->stats->body };
+    my $stats = $teatime->stats->body;
     
     my @return = map {
       [ $_->{name}, $_->{count} ]
@@ -80,8 +68,7 @@ use Web::Simple 'TeaDash::Web';
   }
   
   sub recent_history {
-    my $last_teas = connected { $teatime->last_teas->body };
-    my @history = splice @{ $last_teas->{data} },0,10;
+    my @history = splice @{ $teatime->last_teas->body->{data} },0,10;
     return \@history;
   }
   
@@ -110,8 +97,6 @@ use Web::Simple 'TeaDash::Web';
   }
   
   dispatch {
-    sub (GET + /) { $self->main },
-    sub (GET + /pie) { $self->pie },
     sub (/static/**) {
       my $file = $_[1];
       
@@ -135,6 +120,13 @@ use Web::Simple 'TeaDash::Web';
       [ 200, [ 'Content-type' => $content_type ], [ $data ] ]
     },
     sub (/closed){ $self->closed },
+    subdispatch sub () {
+      return [ sub () { $self->closed } ] unless try { $teatime->current->body }; 
+      [
+        sub (GET + /) { $self->main },
+        sub (GET + /pie) { $self->pie },
+      ]
+    };
   };  
 };
 
