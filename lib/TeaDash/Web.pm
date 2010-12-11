@@ -10,7 +10,7 @@ use Web::Simple 'TeaDash::Web';
   use feature ':5.10';
   
   local $/ = undef;
-  open (my $fh, '<', 'lib/TeaDash/config.json');
+  open (my $fh, '<', 'config.json');
   my $config_file = <$fh>;
   my $config = decode_json($config_file);
 
