@@ -15,8 +15,8 @@ use Web::Simple 'TeaDash::Web';
   my $config = decode_json($config_file);
 
   my $teatime = Net::HTTP::Spore->new_from_spec(
-    $config->{spec_file},
-    api_base_url => $config->{api_base_url}
+    $config->{dash}{spec_file},
+    base_url => $config->{dash}{api_base_url}
   );
   
   $teatime->enable('Format::JSON');
