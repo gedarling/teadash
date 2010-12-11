@@ -73,8 +73,8 @@ use Web::Simple 'TeaDash::Web';
   }
   
   sub main {
-    my $zoom = HTML::Zoom->from_file('static/html/dash.html');
-    
+    my $zoom = HTML::Zoom->from_file("$config->{dash}{webroot}/html/dash.html");
+
     $zoom = $zoom->select('title,#today')
       ->replace_content($self->today);
     
@@ -112,8 +112,8 @@ use Web::Simple 'TeaDash::Web';
           $content_type = 'text/html';
         }
       };
-      
-      open my $fh, '<', "static/$file" or return [ 404, [ 'Content-type', $content_type ], [ 'file not found']];
+
+      open my $fh, '<', "$config->{dash}{webroot}/$file" or return [ 404, [ 'Content-type', $content_type ], [ 'file not found']];
       local $/ = undef;
       my $data = <$fh>;
       close $fh or return [ 500, [ 'Content-type', $content_type ], [ 'Internal Server Error'] ];
