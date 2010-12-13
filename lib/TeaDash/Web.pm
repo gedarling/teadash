@@ -5,6 +5,7 @@ use Web::Simple 'TeaDash::Web';
   use Net::HTTP::Spore;
   use JSON::XS qw/encode_json decode_json/;
   use HTML::Zoom;
+  use DateTime::Format::MSSQL;
   use Try::Tiny;
   use autodie;
   use feature ':5.10';
@@ -42,9 +43,13 @@ use Web::Simple 'TeaDash::Web';
   }
   
   sub last_status {
-    my $current_tea = $teatime->current->body;
+      my $current_tea = $teatime->current->body;
     
-    return "Last status: $current_tea->{data}{events}[0]{name} @ $current_tea->{data}{events}[0]{when}";
+      my $last_time = DateTime::Format::MSSQL->parse_datetime($current_tea->{data}{events}[0]{when}.'000')
+        ->set_time_zone('UTC')
+        ->set_time_zone('America/Chicago');
+    
+    return "Last status: $current_tea->{data}{events}[0]{name} @ $last_time";
   }
   
   sub details {
