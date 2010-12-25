@@ -15,4 +15,9 @@ li {
   line-height: 30px;
 }
 
-
+#links li {
+  display: inline;
+  list-style-type: none;
+  padding-left: 0;
+  padding-right: 1em;
+}

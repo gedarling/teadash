@@ -85,7 +85,15 @@ use Web::Simple 'TeaDash::Web';
     
     $zoom = $zoom->select('#last_status')
       ->replace_content($self->last_status);
-    
+
+    $zoom = $zoom->select('#links')
+      ->repeat_content([
+        map {
+          my $content = \"<a href='$_->[1]'>$_->[0]</a>";
+          sub { $_->select('.link')->replace_content($content) }
+        } @{ $config->{dash}{links} }
+      ]);
+
     $zoom = $zoom->select('#recent_history')
       ->repeat_content([
         map {
