@@ -1,1 +1,16 @@
 A mostly harmless test bed and ostensible front end for the teatime server.
+
+
+=head1 NAME
+
+A mostly harmless test bed and ostensible front end for the L<teatime|/SEE ALSO> server. 
+
+=head1 USAGE
+
+It is remarkably useless without the backend. Go L<here|http://github.com/frioux/teatime> to see setup information and notes.
+
+A public example of both in action can be seen L<at our tea website|http://t.mitsi.com>.
+
+=head1 SEE ALSO
+
+http://github.com/frioux/teatime is what makes it go. Try it out! 
