@@ -34,33 +34,39 @@ use Web::Simple 'TeaDash::Web';
   }
   
   sub closed {
+    my $self = shift;
     return _derp([ 'Content-type', 'text/html'], ['TEA SERVER DOWN']);
   }
   
   sub today {
+    my $self = shift;
     my $current_tea = $teatime->current->body;
     return "Today's tea is $current_tea->{data}{name}";  
   }
   
   sub last_status {
-      my $current_tea = $teatime->current->body;
-    
-      my $last_time = DateTime::Format::SQLite->parse_datetime($current_tea->{data}{events}[0]{when})
-        ->set_time_zone('UTC')
-        ->set_time_zone('America/Chicago');
-    
+    my $self = shift;
+    my $current_tea = $teatime->current->body;
+  
+    my $last_time = DateTime::Format::SQLite->parse_datetime($current_tea->{data}{events}[0]{when})
+      ->set_time_zone('UTC')
+      ->set_time_zone('America/Chicago');
+  
     return "Last status: $current_tea->{data}{events}[0]{name} @ $last_time";
   }
   
   sub details {
+    my $self = shift;
     return $teatime->stats->body->{data};
   }
   
   sub events {
+    my $self = shift;
     return $teatime->current->body->{data}{events};
   }
   
   sub pie {
+    my $self = shift;
     my $stats = $teatime->stats->body;
     
     my @return = map {
@@ -73,11 +79,13 @@ use Web::Simple 'TeaDash::Web';
   }
   
   sub recent_history {
+    my $self = shift;
     my @history = splice @{ $teatime->last_teas->body->{data} },0,10;
     return \@history;
   }
   
   sub main {
+    my $self = shift;
     my $zoom = HTML::Zoom->from_file("$config->{dash}{webroot}/html/dash.html");
 
     $zoom = $zoom->select('title,#today')
@@ -109,8 +117,10 @@ use Web::Simple 'TeaDash::Web';
     return _derp([ 'Content-type', 'text/html'], [$zoom->to_html] );
   }
   
-  dispatch {
+  sub dispatch_request {
+    my $self = shift;
     sub (/static/**) {
+      my $self = shift;
       my $file = $_[1];
       
       my $content_type;
@@ -132,8 +142,12 @@ use Web::Simple 'TeaDash::Web';
       close $fh or return [ 500, [ 'Content-type', $content_type ], [ 'Internal Server Error'] ];
       [ 200, [ 'Content-type' => $content_type ], [ $data ] ]
     },
-    sub (/closed){ $self->closed },
-    subdispatch sub () {
+    sub (/closed){
+      my $self = shift;  
+      $self->closed
+    },
+    sub () {
+      my $self = shift;
       return [ sub () { $self->closed } ] unless try { $teatime->current->body }; 
       [
         sub (GET + /) { $self->main },
