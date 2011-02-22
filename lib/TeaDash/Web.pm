@@ -7,6 +7,7 @@ use Web::Simple 'TeaDash::Web';
   use HTML::Zoom;
   use DateTime::Format::SQLite;
   use Try::Tiny;
+  use Plack::App::File;
   use autodie;
   use feature ':5.10';
   
@@ -22,20 +23,9 @@ use Web::Simple 'TeaDash::Web';
   
   $teatime->enable('Format::JSON');
   
-  sub _derp {
-    my $headers = shift;
-    my $data = shift;
-    
-    [
-      200,
-      $headers,
-      $data  
-    ]
-  }
-  
   sub closed {
     my $self = shift;
-    return _derp([ 'Content-type', 'text/html'], ['TEA SERVER DOWN']);
+    return [200, [ 'Content-Type', 'text/html'], ['TEA SERVER DOWN']];
   }
   
   sub today {
@@ -73,9 +63,7 @@ use Web::Simple 'TeaDash::Web';
       [ $_->{name}, $_->{count} ]
     } @{ $stats->{data}};
     
-    return _derp([ 'Content-type', 'text/json' ],
-      [ encode_json(\@return) ]
-    );
+    return [200,[ 'Content-Type', 'text/json' ],[ encode_json(\@return) ]];
   }
   
   sub recent_history {
@@ -86,6 +74,7 @@ use Web::Simple 'TeaDash::Web';
   
   sub main {
     my $self = shift;
+    
     my $zoom = HTML::Zoom->from_file("$config->{dash}{webroot}/html/dash.html");
 
     $zoom = $zoom->select('title,#today')
@@ -114,46 +103,37 @@ use Web::Simple 'TeaDash::Web';
         } @{ $self->recent_history }
       ]);
     
-    return _derp([ 'Content-type', 'text/html'], [$zoom->to_html] );
+    return [200,[ 'Content-Type', 'text/html'], [$zoom->to_html]];
   }
-  
+  my $files = Plack::App::File->new(root => $config->{dash}{webroot});
   sub dispatch_request {
     my $self = shift;
-    sub (/static/**) {
-      my $self = shift;
-      my $file = $_[1];
-      
-      my $content_type;
-      given ($file) {
-        when (/.js/){
-          $content_type = 'text/javascript';
-        }
-        when (/.css/){
-          $content_type = 'text/css';
-        }
-        default {
-          $content_type = 'text/html';
-        }
-      };
-
-      open my $fh, '<', "$config->{dash}{webroot}/$file" or return [ 404, [ 'Content-type', $content_type ], [ 'file not found']];
-      local $/ = undef;
-      my $data = <$fh>;
-      close $fh or return [ 500, [ 'Content-type', $content_type ], [ 'Internal Server Error'] ];
-      [ 200, [ 'Content-type' => $content_type ], [ $data ] ]
-    },
+    (
+    # sub (/static/...) { $files },
+    sub (/static/...) {
+         use Devel::Dwarn;
+         Dwarn \@_;
+         my $file = $_[1]->{PATH_INFO};
+         open my $fh, '<', "$config->{dash}{webroot}$file" or return [ 404, [ 'Content-type', 'text/html' ], [ 'file not found']];
+         local $/ = undef;
+         my $data = <$fh>;
+         close $fh or return [ 500, [ 'Content-type', 'text/html' ], [ 'Internal Server Error'] ];
+         [ 200, [ ], [ $data ] ]
+      },
     sub (/closed){
       my $self = shift;  
       $self->closed
     },
-    sub () {
+    sub (GET) {
       my $self = shift;
-      return [ sub () { $self->closed } ] unless try { $teatime->current->body }; 
-      [
-        sub (GET + /) { $self->main },
-        sub (GET + /pie) { $self->pie },
-      ]
-    };
+    
+      return ( sub (GET) { $self->closed } ) unless try { $teatime->current->body }; 
+      (
+        sub (/) { $self->main },
+        sub (/pie) { $self->pie },
+      )
+    }
+    )
   };  
 };
 
