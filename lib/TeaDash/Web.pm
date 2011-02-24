@@ -105,21 +105,13 @@ use Web::Simple 'TeaDash::Web';
     
     return [200,[ 'Content-Type', 'text/html'], [$zoom->to_html]];
   }
+  
   my $files = Plack::App::File->new(root => $config->{dash}{webroot});
+  
   sub dispatch_request {
     my $self = shift;
     (
-    # sub (/static/...) { $files },
-    sub (/static/...) {
-         use Devel::Dwarn;
-         Dwarn \@_;
-         my $file = $_[1]->{PATH_INFO};
-         open my $fh, '<', "$config->{dash}{webroot}$file" or return [ 404, [ 'Content-type', 'text/html' ], [ 'file not found']];
-         local $/ = undef;
-         my $data = <$fh>;
-         close $fh or return [ 500, [ 'Content-type', 'text/html' ], [ 'Internal Server Error'] ];
-         [ 200, [ ], [ $data ] ]
-      },
+    sub (/static/...) { $files },
     sub (/closed){
       my $self = shift;  
       $self->closed
