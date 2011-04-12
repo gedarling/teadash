@@ -6,6 +6,9 @@ $.getJSON('/pie', function(data) {
       plotBorderWidth: null,
       plotShadow: false
     },
+    credits: {
+      enabled: false
+    },    
     title: {
       text: 'Tea Consumption'
     },
@@ -30,6 +33,8 @@ $.getJSON('/pie', function(data) {
     },
      series: [{
       type: 'pie',
+      size: '75%',
+      innerSize: '15%',      
       data: data
     }]
   });  
