@@ -18,6 +18,14 @@ body {
   color: #cc9966
 }
 
+.last_status {
+  text-align: right;
+}
+
+.last_time {
+  text-align: right;
+}
+
 li {
   padding-left: 2em;
   line-height: 30px;

@@ -6,6 +6,7 @@ use Web::Simple 'TeaDash::Web';
   use JSON::XS qw/encode_json decode_json/;
   use HTML::Zoom;
   use DateTime::Format::SQLite;
+  use DateTime::Format::Strptime;
   use Try::Tiny;
   use Plack::App::File;
   use autodie;
@@ -38,13 +39,20 @@ use Web::Simple 'TeaDash::Web';
     my $self = shift;
     my $current_tea = $teatime->current->body;
   
-    my $last_time = DateTime::Format::SQLite->parse_datetime($current_tea->{data}{events}[0]{when})
+    my $dt = DateTime::Format::SQLite->parse_datetime($current_tea->{data}{events}[0]{when})
       ->set_time_zone('UTC')
-      ->set_time_zone('America/Chicago')
-      ->hms;
+      ->set_time_zone('America/Chicago');
   
+    my $strp = new DateTime::Format::Strptime(
+      pattern     => '%I:%M %p',
+      locale      => 'en_US',
+      time_zone   => 'America/Chicago',
+    );
+
+    my $last_time = $strp->format_datetime( $dt );
+
     return "Last status: $current_tea->{data}{events}[0]{name} @ $last_time";
-  }
+  } 
   
   sub details {
     my $self = shift;
@@ -83,7 +91,7 @@ use Web::Simple 'TeaDash::Web';
     
     $zoom = $zoom->select('#last_status')
       ->replace_content($self->last_status);
-
+      
     $zoom = $zoom->select('#links')
       ->repeat_content([
         map {
