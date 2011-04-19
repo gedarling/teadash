@@ -40,7 +40,8 @@ use Web::Simple 'TeaDash::Web';
   
     my $last_time = DateTime::Format::SQLite->parse_datetime($current_tea->{data}{events}[0]{when})
       ->set_time_zone('UTC')
-      ->set_time_zone('America/Chicago');
+      ->set_time_zone('America/Chicago')
+      ->hms;
   
     return "Last status: $current_tea->{data}{events}[0]{name} @ $last_time";
   }

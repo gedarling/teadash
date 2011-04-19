@@ -3,11 +3,19 @@
 }
 
 body {
-  background-color: #FFFFFF;
+  background-color: #ffff99;
 }
 
 #recent_history {
   list-style: none;
+}
+
+.tea {
+  font-weight: bold;
+}
+
+.time {
+  color: #cc9966
 }
 
 li {

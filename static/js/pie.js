@@ -1,8 +1,9 @@
 $.getJSON('/pie', function(data) {  
   var chart = new Highcharts.Chart({
     chart: {
+      backgroundColor: '#ffff99',
       renderTo:'pie_graph',
-      plotBackgroundColor: null,
+      plotBackgroundColor: '#ffff99',
       plotBorderWidth: null,
       plotShadow: false
     },
@@ -10,7 +11,11 @@ $.getJSON('/pie', function(data) {
       enabled: false
     },    
     title: {
-      text: 'Tea Consumption'
+      text: 'Tea Consumption',
+      style: {
+        color: '#000000',
+        fontWeight: 'bold'
+      }      
     },
     tooltip: {
       formatter: function() {
